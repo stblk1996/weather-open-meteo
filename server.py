@@ -1,11 +1,13 @@
 import json
 import os
+from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, quote, urlencode, urlparse
 from urllib.request import Request, urlopen
 
 PORT = int(os.getenv("PORT", "3000"))
 HOST = os.getenv("HOST", "0.0.0.0")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class WeatherHandler(SimpleHTTPRequestHandler):
@@ -93,6 +95,7 @@ class WeatherHandler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
 if __name__ == "__main__":
-    server = ThreadingHTTPServer((HOST, PORT), WeatherHandler)
+    handler = partial(WeatherHandler, directory=BASE_DIR)
+    server = ThreadingHTTPServer((HOST, PORT), handler)
     print(f"Server started: http://{HOST}:{PORT}")
     server.serve_forever()
