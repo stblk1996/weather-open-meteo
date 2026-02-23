@@ -1,10 +1,11 @@
 const form = document.getElementById('weather-form');
 const cityInput = document.getElementById('city');
+const dateInput = document.getElementById('weather-date');
 const result = document.getElementById('result');
 const submitButton = form.querySelector('button');
 
 function getWeatherVisual(code, isDay) {
-  const day = isDay === 1;
+  const day = isDay !== 0;
 
   if (code === 0) {
     return {
@@ -69,33 +70,51 @@ function getWeatherVisual(code, isDay) {
 }
 
 function formatResult(data) {
-  const visual = getWeatherVisual(Number(data.weatherCode), Number(data.isDay));
+  const visual = getWeatherVisual(Number(data.weatherCode), 1);
 
   return `
     <article class="weather-box">
       <div class="weather-icon" aria-hidden="true">${visual.icon}</div>
       <div class="weather-info">
         <p class="weather-city">${data.city}</p>
+        <p class="weather-date">${data.date}</p>
         <p class="weather-meta">${visual.label}</p>
-        <p class="weather-temp">${data.temp}°C</p>
-        <p class="weather-feels">Ощущается как ${data.feelsLike}°C</p>
+        <p class="weather-temp">от ${data.tempMin}°C до ${data.tempMax}°C</p>
+        <p class="weather-feels">Ощущается как от ${data.feelsLikeMin}°C до ${data.feelsLikeMax}°C</p>
       </div>
     </article>
   `;
 }
 
+function setupDateInput() {
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  const maxDate = new Date(now);
+  maxDate.setDate(now.getDate() + 15);
+  const max = maxDate.toISOString().slice(0, 10);
+
+  dateInput.min = today;
+  dateInput.max = max;
+  dateInput.value = today;
+}
+
+setupDateInput();
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   const city = cityInput.value.trim();
-  if (!city) return;
+  const selectedDate = dateInput.value;
+  if (!city || !selectedDate) return;
 
   submitButton.disabled = true;
   result.className = 'result';
   result.textContent = 'Загружаю данные...';
 
   try {
-    const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`);
+    const response = await fetch(
+      `/api/weather?city=${encodeURIComponent(city)}&date=${encodeURIComponent(selectedDate)}`,
+    );
     const data = await response.json();
 
     if (!response.ok) {

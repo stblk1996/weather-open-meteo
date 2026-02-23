@@ -107,6 +107,12 @@ button:disabled {
   color: var(--muted);
 }
 
+.weather-date {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .weather-temp {
   margin-top: 8px;
   font-size: 34px;

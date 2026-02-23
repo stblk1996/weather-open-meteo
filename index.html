@@ -14,7 +14,9 @@
     <form id="weather-form">
       <label for="city">Город</label>
       <input id="city" name="city" type="text" placeholder="Москва" required />
-      <button type="submit">Какая сегодня температура?</button>
+      <label for="weather-date">Дата</label>
+      <input id="weather-date" name="date" type="date" required />
+      <button type="submit">Показать погоду на дату</button>
     </form>
 
     <section id="result" class="result" aria-live="polite"></section>
