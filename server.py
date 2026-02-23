@@ -40,6 +40,8 @@ class WeatherHandler(SimpleHTTPRequestHandler):
                     "city": city,
                     "temp": weather.get("temperature_2m"),
                     "feelsLike": weather.get("apparent_temperature"),
+                    "weatherCode": weather.get("weather_code"),
+                    "isDay": weather.get("is_day"),
                 },
             )
         except Exception as error:
@@ -69,7 +71,7 @@ class WeatherHandler(SimpleHTTPRequestHandler):
             {
                 "latitude": lat,
                 "longitude": lon,
-                "current": "temperature_2m,apparent_temperature",
+                "current": "temperature_2m,apparent_temperature,weather_code,is_day",
                 "timezone": "auto",
             },
             encoding="utf-8",
