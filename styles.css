@@ -55,6 +55,30 @@ input {
   border: 1px solid #ced8f0;
 }
 
+.purpose-group {
+  border: 1px solid #ced8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 2px 0;
+}
+
+.purpose-group legend {
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.purpose-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.purpose-option input {
+  margin: 0;
+}
+
 button {
   border: none;
   background: var(--accent);
@@ -123,6 +147,16 @@ button:disabled {
 .weather-feels {
   margin-top: 6px;
   color: var(--muted);
+}
+
+.weather-advice {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  background: #eef4ff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
 }
 
 .error {

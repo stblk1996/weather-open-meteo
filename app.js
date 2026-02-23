@@ -71,6 +71,7 @@ function getWeatherVisual(code, isDay) {
 
 function formatResult(data) {
   const visual = getWeatherVisual(Number(data.weatherCode), 1);
+  const advice = getPurposeAdvice(data);
 
   return `
     <article class="weather-box">
@@ -81,9 +82,42 @@ function formatResult(data) {
         <p class="weather-meta">${visual.label}</p>
         <p class="weather-temp">от ${data.tempMin}°C до ${data.tempMax}°C</p>
         <p class="weather-feels">Ощущается как от ${data.feelsLikeMin}°C до ${data.feelsLikeMax}°C</p>
+        <p class="weather-advice">${advice}</p>
       </div>
     </article>
   `;
+}
+
+function getPurposeAdvice(data) {
+  const purpose = data.purpose;
+  const weatherCode = Number(data.weatherCode);
+  const maxTemp = Number(data.tempMax);
+  const minTemp = Number(data.tempMin);
+  const rainy = [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(weatherCode);
+  const snowy = [71, 73, 75, 77, 85, 86].includes(weatherCode);
+  const storm = [95, 96, 99].includes(weatherCode);
+
+  if (purpose === 'walk') {
+    if (storm) return 'Для прогулки день небезопасный: лучше перенести или сократить маршрут.';
+    if (rainy || snowy) return 'Для прогулки пригодится непромокаемая обувь и верхняя одежда по погоде.';
+    if (maxTemp >= 24) return 'Для прогулки будет тепло: возьмите воду и легкую одежду.';
+    if (minTemp <= 3) return 'Для прогулки будет прохладно: лучше одеться теплее.';
+    return 'Для прогулки условия в целом комфортные.';
+  }
+
+  if (purpose === 'vacation') {
+    if (storm) return 'Для планирования отпуска учтите риск грозы в этот день.';
+    if (rainy || snowy) return 'Для отпуска на эту дату стоит предусмотреть запасной план в помещении.';
+    return 'Для отпуска погода выглядит благоприятной на выбранную дату.';
+  }
+
+  if (purpose === 'work') {
+    if (storm || rainy || snowy) return 'Для дороги на работу заложите дополнительное время на путь.';
+    if (minTemp <= 0) return 'Для дороги на работу одевайтесь теплее и учитывайте возможный гололед утром.';
+    return 'Для дороги на работу погодные условия спокойные.';
+  }
+
+  return 'Погода на выбранную дату показана для справки.';
 }
 
 function setupDateInput() {
@@ -121,6 +155,7 @@ form.addEventListener('submit', async (event) => {
       throw new Error(data.error || 'Не удалось получить погоду');
     }
 
+    data.purpose = form.elements.purpose.value;
     result.innerHTML = formatResult(data);
   } catch (error) {
     result.className = 'result error';

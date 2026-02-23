@@ -16,6 +16,13 @@
       <input id="city" name="city" type="text" placeholder="Москва" required />
       <label for="weather-date">Дата</label>
       <input id="weather-date" name="date" type="date" required />
+      <fieldset class="purpose-group">
+        <legend>С какой целью вы интересуетесь погодой?</legend>
+        <label class="purpose-option"><input type="radio" name="purpose" value="walk" required /> Для прогулки</label>
+        <label class="purpose-option"><input type="radio" name="purpose" value="vacation" /> Планирую отпуск в этом городе/регионе</label>
+        <label class="purpose-option"><input type="radio" name="purpose" value="work" /> Добраться до работы</label>
+        <label class="purpose-option"><input type="radio" name="purpose" value="interest" /> Ради интереса</label>
+      </fieldset>
       <button type="submit">Показать погоду на дату</button>
     </form>
 
