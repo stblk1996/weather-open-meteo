@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Аналитика сайта погоды</title>
+  <link rel="stylesheet" href="analytics.css" />
+</head>
+<body>
+  <main class="dashboard">
+    <header class="topbar">
+      <h1>Аналитика сайта погоды</h1>
+      <a class="back-link" href="/">На главную</a>
+    </header>
+
+    <section class="kpi-grid" id="kpis"></section>
+
+    <section class="panel">
+      <h2>Заходы по дням</h2>
+      <div id="viewsByDay"></div>
+    </section>
+
+    <section class="panel">
+      <h2>На какие даты нажимали</h2>
+      <div id="datesClicked"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Ретеншен пользователей</h2>
+      <div id="retention"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Переходы по ссылкам</h2>
+      <div id="linkClicks"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Ошибки</h2>
+      <div id="errors"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Скорость загрузки</h2>
+      <div id="pageLoad"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Какие страны/города вводили в поиск</h2>
+      <div class="split-2">
+        <div>
+          <h3>Города (введенные)</h3>
+          <div id="enteredCities"></div>
+        </div>
+        <div>
+          <h3>Страны (распознанные)</h3>
+          <div id="countries"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="analytics.js" defer></script>
+</body>
+</html>

@@ -7,17 +7,58 @@ const submitButton = form.querySelector('button');
 const INTERNET_LINKS = {
   umbrella: 'https://www.ozon.ru/search/?text=%D0%B7%D0%BE%D0%BD%D1%82',
   raincoat: 'https://www.ozon.ru/search/?text=%D0%B4%D0%BE%D0%B6%D0%B4%D0%B5%D0%B2%D0%B8%D0%BA',
-  waterproofShoes: 'https://www.ozon.ru/search/?text=%D0%B2%D0%BE%D0%B4%D0%BE%D0%BD%D0%B5%D0%BF%D1%80%D0%BE%D0%BD%D0%B8%D1%86%D0%B0%D0%B5%D0%BC%D0%B0%D1%8F+%D0%BE%D0%B1%D1%83%D0%B2%D1%8C',
   thermalWear: 'https://www.ozon.ru/search/?text=%D1%82%D0%B5%D1%80%D0%BC%D0%BE%D0%B1%D0%B5%D0%BB%D1%8C%D0%B5',
   sunglasses: 'https://www.ozon.ru/search/?text=%D1%81%D0%BE%D0%BB%D0%BD%D1%86%D0%B5%D0%B7%D0%B0%D1%89%D0%B8%D1%82%D0%BD%D1%8B%D0%B5+%D0%BE%D1%87%D0%BA%D0%B8',
-  sunscreen: 'https://www.ozon.ru/search/?text=spf+50',
   fashionTrends: 'https://www.vogue.com/fashion/trends',
   cityTrends: 'https://www.vogue.com/article/backless-loafers',
   routes: 'https://yandex.ru/maps/',
   traffic: 'https://yandex.ru/maps/moscow/probki',
   publicTransport: 'https://yandex.ru/maps/moscow/transport',
-  migraines: 'https://www.mayoclinic.org/diseases-conditions/migraine-headache/expert-answers/migraine-headache/faq-20058505',
+  migraines:
+    'https://www.mayoclinic.org/diseases-conditions/migraine-headache/expert-answers/migraine-headache/faq-20058505',
 };
+
+function getClientId() {
+  const key = 'weather_client_id';
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+
+  const generated = `c_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  localStorage.setItem(key, generated);
+  return generated;
+}
+
+function getSessionId() {
+  const key = 'weather_session_id';
+  const existing = sessionStorage.getItem(key);
+  if (existing) return existing;
+
+  const generated = `s_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  sessionStorage.setItem(key, generated);
+  return generated;
+}
+
+const CLIENT_ID = getClientId();
+const SESSION_ID = getSessionId();
+
+async function trackEvent(eventType, payload = {}) {
+  try {
+    await fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventType,
+        clientId: CLIENT_ID,
+        sessionId: SESSION_ID,
+        path: window.location.pathname,
+        ...payload,
+      }),
+      keepalive: true,
+    });
+  } catch (_) {
+    // Avoid surfacing analytics errors to user.
+  }
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -99,7 +140,7 @@ function getPurposeLabel(purpose) {
   return labels[purpose] || 'Ради интереса';
 }
 
-function buildRecommendations(purpose, bucket, tempMin, tempMax) {
+function buildRecommendations(purpose, bucket, _tempMin, tempMax) {
   const cold = tempMax <= 5;
   const hot = tempMax >= 26;
 
@@ -179,9 +220,7 @@ function buildRecommendations(purpose, bucket, tempMin, tempMax) {
         { text: 'Пробки', href: INTERNET_LINKS.traffic },
         { text: 'Общественный транспорт', href: INTERNET_LINKS.publicTransport },
       ],
-      health: [
-        { text: 'Погодные триггеры мигрени (Mayo Clinic)', href: INTERNET_LINKS.migraines },
-      ],
+      health: [{ text: 'Погодные триггеры мигрени (Mayo Clinic)', href: INTERNET_LINKS.migraines }],
     },
   };
 }
@@ -265,12 +304,44 @@ function setupDateInput() {
 
 setupDateInput();
 
+result.addEventListener('click', (event) => {
+  const link = event.target.closest('a.rec-link, a.ad-link');
+  if (!link) return;
+
+  trackEvent('link_click', {
+    linkUrl: link.href,
+  });
+});
+
+window.addEventListener('load', () => {
+  const nav = performance.getEntriesByType('navigation')[0];
+  const loadMs = nav ? nav.loadEventEnd : performance.now();
+
+  trackEvent('page_view', { path: window.location.pathname });
+  trackEvent('page_perf', { loadMs: Math.round(loadMs) });
+});
+
+window.addEventListener('error', (event) => {
+  trackEvent('error', {
+    errorCode: 'frontend_error',
+    errorMessage: event.message || 'Unknown frontend error',
+  });
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  trackEvent('error', {
+    errorCode: 'frontend_unhandled_rejection',
+    errorMessage: event.reason ? String(event.reason) : 'Unhandled rejection',
+  });
+});
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   const city = cityInput.value.trim();
   const selectedDate = dateInput.value;
-  if (!city || !selectedDate) return;
+  const purpose = form.elements.purpose.value;
+  if (!city || !selectedDate || !purpose) return;
 
   submitButton.disabled = true;
   result.className = 'result';
@@ -278,7 +349,7 @@ form.addEventListener('submit', async (event) => {
 
   try {
     const response = await fetch(
-      `/api/weather?city=${encodeURIComponent(city)}&date=${encodeURIComponent(selectedDate)}`,
+      `/api/weather?city=${encodeURIComponent(city)}&date=${encodeURIComponent(selectedDate)}&purpose=${encodeURIComponent(purpose)}&clientId=${encodeURIComponent(CLIENT_ID)}&sessionId=${encodeURIComponent(SESSION_ID)}`,
     );
     const data = await response.json();
 
@@ -286,11 +357,19 @@ form.addEventListener('submit', async (event) => {
       throw new Error(data.error || 'Не удалось получить погоду');
     }
 
-    data.purpose = form.elements.purpose.value;
+    data.purpose = purpose;
     result.innerHTML = formatResult(data);
   } catch (error) {
     result.className = 'result error';
     result.textContent = error.message;
+
+    trackEvent('error', {
+      errorCode: 'weather_request_failed',
+      errorMessage: error.message,
+      cityInput: city,
+      targetDate: selectedDate,
+      purpose,
+    });
   } finally {
     submitButton.disabled = false;
   }
