@@ -11,6 +11,9 @@ PORT = int(os.getenv("PORT", "10000"))
 HOST = os.getenv("HOST", "0.0.0.0")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "analytics.db")
+ANALYTICS_PASSWORD = os.getenv("ANALYTICS_PASSWORD", "1996")
+ANALYTICS_COOKIE_NAME = "analytics_auth"
+ANALYTICS_COOKIE_VALUE = "ok"
 
 
 def utc_now_iso() -> str:
@@ -318,6 +321,20 @@ def build_analytics_payload():
 
 
 class WeatherHandler(SimpleHTTPRequestHandler):
+    def parse_cookies(self):
+        raw = self.headers.get("Cookie", "")
+        cookies = {}
+        for chunk in raw.split(";"):
+            if "=" not in chunk:
+                continue
+            key, value = chunk.split("=", 1)
+            cookies[key.strip()] = value.strip()
+        return cookies
+
+    def is_analytics_authorized(self) -> bool:
+        cookies = self.parse_cookies()
+        return cookies.get(ANALYTICS_COOKIE_NAME) == ANALYTICS_COOKIE_VALUE
+
     def do_GET(self):
         parsed = urlparse(self.path)
 
@@ -326,10 +343,20 @@ class WeatherHandler(SimpleHTTPRequestHandler):
             return
 
         if parsed.path == "/api/analytics":
+            if not self.is_analytics_authorized():
+                self.send_json(401, {"error": "Unauthorized"})
+                return
             self.handle_analytics()
             return
 
+        if parsed.path == "/analytics-login":
+            self.path = "/analytics-login.html"
+            return super().do_GET()
+
         if parsed.path == "/analytics":
+            if not self.is_analytics_authorized():
+                self.path = "/analytics-login.html"
+                return super().do_GET()
             self.path = "/analytics.html"
             return super().do_GET()
 
@@ -341,12 +368,40 @@ class WeatherHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         parsed = urlparse(self.path)
 
+        if parsed.path == "/api/analytics-login":
+            self.handle_analytics_login()
+            return
+
         if parsed.path == "/api/track":
             self.handle_track_event()
             return
 
         self.send_response(404)
         self.end_headers()
+
+    def handle_analytics_login(self):
+        try:
+            content_length = int(self.headers.get("Content-Length", "0"))
+            raw_body = self.rfile.read(content_length) if content_length else b"{}"
+            data = json.loads(raw_body.decode("utf-8"))
+            password = (data.get("password") or "").strip()
+
+            if password != ANALYTICS_PASSWORD:
+                self.send_json(401, {"error": "Неверный пароль"})
+                return
+
+            body = json.dumps({"ok": True}, ensure_ascii=True).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header(
+                "Set-Cookie",
+                f"{ANALYTICS_COOKIE_NAME}={ANALYTICS_COOKIE_VALUE}; Path=/; Max-Age=86400; HttpOnly; SameSite=Lax",
+            )
+            self.end_headers()
+            self.wfile.write(body)
+        except Exception as error:
+            self.send_json(500, {"error": str(error)})
 
     def handle_analytics(self):
         try:

@@ -71,11 +71,22 @@ button {
 
 input {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: block;
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 12px 14px;
   background: var(--panel-strong);
   color: var(--text);
+}
+
+#weather-date {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 input:focus {
@@ -250,6 +261,11 @@ button:disabled {
   border-radius: 12px;
   padding: 10px 12px;
   background: rgba(255, 245, 246, 0.9);
+}
+
+.analytics-link-row {
+  margin: 16px 0 0;
+  font-size: 14px;
 }
 
 @media (max-width: 700px) {
