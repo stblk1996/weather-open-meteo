@@ -1,13 +1,15 @@
 :root {
-  --bg-top: #f5f7fb;
-  --bg-bottom: #eceff5;
-  --panel: rgba(255, 255, 255, 0.8);
-  --panel-strong: #ffffff;
-  --text: #111113;
-  --muted: #6e6e73;
-  --line: rgba(0, 0, 0, 0.08);
-  --accent: #0071e3;
-  --accent-hover: #0077ed;
+  --bg-top: #fff4bf;
+  --bg-bottom: #d8f0cb;
+  --panel: rgba(255, 255, 255, 0.86);
+  --panel-strong: #fffef6;
+  --text: #2d1a1f;
+  --muted: #6d4a52;
+  --line: rgba(92, 31, 45, 0.18);
+  --accent: #7b1e3a;
+  --accent-hover: #6b1731;
+  --green-soft: #dff1d7;
+  --yellow-soft: #fff3bf;
 }
 
 * {
@@ -87,7 +89,7 @@ input:focus {
   border-radius: 16px;
   padding: 12px 14px;
   margin: 2px 0;
-  background: rgba(255, 255, 255, 0.6);
+  background: linear-gradient(180deg, var(--yellow-soft), var(--green-soft));
 }
 
 .purpose-group legend {
@@ -95,15 +97,19 @@ input:focus {
 }
 
 .purpose-option {
-  display: flex;
+  display: grid;
+  grid-template-columns: 18px 1fr;
   align-items: center;
-  gap: 8px;
+  column-gap: 10px;
   margin: 8px 0;
   font-size: 14px;
+  line-height: 1.35;
 }
 
 .purpose-option input {
   margin: 0;
+  width: 18px;
+  height: 18px;
   accent-color: var(--accent);
 }
 
@@ -111,7 +117,7 @@ button {
   border: 0;
   border-radius: 999px;
   background: var(--accent);
-  color: #fff;
+  color: #fff8f2;
   padding: 12px 18px;
   font-weight: 600;
   cursor: pointer;
@@ -143,7 +149,7 @@ button:disabled {
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.78);
+  background: linear-gradient(180deg, #fffef7, #f8fbe9);
 }
 
 .weather-icon {
@@ -154,7 +160,7 @@ button:disabled {
   display: grid;
   place-items: center;
   font-size: 42px;
-  background: linear-gradient(180deg, #ffffff, #f2f4f8);
+  background: linear-gradient(180deg, #ffeaa6, #d8f0cb);
 }
 
 .weather-info p {
@@ -188,7 +194,7 @@ button:disabled {
   margin-top: 12px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: var(--panel-strong);
+  background: linear-gradient(180deg, #fffdf2, #f2f9e9);
   padding: 12px;
 }
 
@@ -220,8 +226,8 @@ button:disabled {
   display: inline-block;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: #f6f7fb;
-  color: #1d1d1f;
+  background: #fff7cf;
+  color: #4a1c2a;
   text-decoration: none;
   padding: 6px 10px;
   font-size: 12px;
@@ -230,7 +236,7 @@ button:disabled {
 
 .rec-link:hover,
 .ad-link:hover {
-  background: #edf2f8;
+  background: #e6f4da;
 }
 
 .ad-box p {
