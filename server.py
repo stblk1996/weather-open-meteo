@@ -5,7 +5,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, quote, urlencode, urlparse
 from urllib.request import Request, urlopen
 
-PORT = int(os.getenv("PORT", "3000"))
+PORT = int(os.getenv("PORT", "10000"))
 HOST = os.getenv("HOST", "0.0.0.0")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
