@@ -50,7 +50,7 @@
           throw new Error(data.error || 'Ошибка входа');
         }
 
-        window.location.href = '/analytics';
+        window.location.href = `/analytics?password=${encodeURIComponent(passwordInput.value)}`;
       } catch (err) {
         errorEl.textContent = err.message;
       }

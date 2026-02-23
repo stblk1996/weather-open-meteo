@@ -8,6 +8,7 @@
   --line: rgba(92, 31, 45, 0.18);
   --accent: #7b1e3a;
   --accent-hover: #6b1731;
+  --pantone-13-0324-tcx: #7cc36f;
   --green-soft: #dff1d7;
   --yellow-soft: #fff3bf;
 }
@@ -266,6 +267,13 @@ button:disabled {
 .analytics-link-row {
   margin: 16px 0 0;
   font-size: 14px;
+}
+
+.analytics-link-row a {
+  color: var(--pantone-13-0324-tcx);
+  font-weight: 600;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
 }
 
 @media (max-width: 700px) {

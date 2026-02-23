@@ -337,13 +337,29 @@ class WeatherHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urlparse(self.path)
+        query = parse_qs(parsed.query)
+
+        if parsed.path == "/analytics" and (
+            (query.get("password", [""])[0] or "").strip() == ANALYTICS_PASSWORD
+        ):
+            self.send_response(302)
+            self.send_header("Location", "/analytics")
+            self.send_header(
+                "Set-Cookie",
+                f"{ANALYTICS_COOKIE_NAME}={ANALYTICS_COOKIE_VALUE}; Path=/; Max-Age=86400; SameSite=Lax",
+            )
+            self.end_headers()
+            return
 
         if parsed.path == "/api/weather":
             self.handle_weather(parsed.query)
             return
 
         if parsed.path == "/api/analytics":
-            if not self.is_analytics_authorized():
+            has_password_query = (
+                (query.get("password", [""])[0] or "").strip() == ANALYTICS_PASSWORD
+            )
+            if not self.is_analytics_authorized() and not has_password_query:
                 self.send_json(401, {"error": "Unauthorized"})
                 return
             self.handle_analytics()
@@ -396,7 +412,7 @@ class WeatherHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             self.send_header(
                 "Set-Cookie",
-                f"{ANALYTICS_COOKIE_NAME}={ANALYTICS_COOKIE_VALUE}; Path=/; Max-Age=86400; HttpOnly; SameSite=Lax",
+                f"{ANALYTICS_COOKIE_NAME}={ANALYTICS_COOKIE_VALUE}; Path=/; Max-Age=86400; SameSite=Lax",
             )
             self.end_headers()
             self.wfile.write(body)
