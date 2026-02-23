@@ -56,35 +56,35 @@ function getWeatherBucket(code) {
 function buildAd(bucket) {
   if (bucket === 'rain' || bucket === 'drizzle') {
     return {
-      title: 'Реклама по погоде',
-      text: 'Ожидаются осадки. Проверьте подборку зонтов и дождевиков онлайн.',
-      linkText: 'Смотреть зонты и дождевики',
+      title: 'Подборка по погоде',
+      text: 'Если хотите, можно посмотреть подборку зонтов и дождевиков.',
+      linkText: 'Зонты и дождевики',
       href: INTERNET_LINKS.umbrella,
     };
   }
 
   if (bucket === 'snow') {
     return {
-      title: 'Реклама по погоде',
-      text: 'Снег и холод: может пригодиться термобелье и утепленная обувь.',
-      linkText: 'Подобрать термобелье',
+      title: 'Подборка по погоде',
+      text: 'Для холодной погоды может пригодиться термобелье.',
+      linkText: 'Термобелье',
       href: INTERNET_LINKS.thermalWear,
     };
   }
 
   if (bucket === 'storm') {
     return {
-      title: 'Реклама по погоде',
-      text: 'Грозовая погода: лучше выбрать водозащиту для одежды и обуви.',
-      linkText: 'Посмотреть дождевики',
+      title: 'Подборка по погоде',
+      text: 'Для грозовой погоды можно посмотреть водозащитную одежду.',
+      linkText: 'Дождевики',
       href: INTERNET_LINKS.raincoat,
     };
   }
 
   return {
-    title: 'Реклама по погоде',
-    text: 'Ясная или облачная погода: можно подобрать солнцезащитные аксессуары.',
-    linkText: 'Смотреть солнцезащитные очки',
+    title: 'Подборка по погоде',
+    text: 'Для ясной погоды можно посмотреть солнцезащитные аксессуары.',
+    linkText: 'Солнцезащитные очки',
     href: INTERNET_LINKS.sunglasses,
   };
 }
@@ -139,20 +139,20 @@ function buildRecommendations(purpose, bucket, tempMin, tempMax) {
 
   if (purpose === 'work') {
     if (bucket === 'rain' || bucket === 'snow' || bucket === 'storm') {
-      transport.push('Лучше выехать раньше и проверить пробки/маршрут онлайн.');
+      transport.push('Можно заложить небольшой запас времени и проверить маршрут онлайн.');
     } else {
       transport.push('Можно выбрать общественный транспорт или велосипед по ситуации.');
     }
   } else if (purpose === 'vacation') {
     transport.push('Для поездок по городу заранее проверьте туристические маршруты и транспорт.');
   } else if (purpose === 'walk') {
-    transport.push('Если осадки, лучше выбрать короткие маршруты с точками укрытия.');
+    transport.push('Если ожидаются осадки, удобно выбирать короткие маршруты с точками укрытия.');
   } else {
     transport.push('Для справки можно сравнить время в пути в картах перед выходом.');
   }
 
   if (bucket === 'storm') {
-    meteo.push('Метеозависимым лучше снизить нагрузку и избегать длительного пребывания на улице.');
+    meteo.push('Метеозависимым может быть комфортнее снизить нагрузку и сократить время на улице.');
   } else if (bucket === 'snow' || bucket === 'rain') {
     meteo.push('При перепадах давления и влажности держите под рукой назначенные лекарства.');
   } else {
@@ -218,25 +218,25 @@ function formatResult(data) {
         <p class="weather-feels">Ощущается как от ${escapeHtml(data.feelsLikeMin)}°C до ${escapeHtml(data.feelsLikeMax)}°C</p>
 
         <section class="rec-block">
-          <h3>1) Что взять с собой</h3>
+          <h3>Что взять с собой</h3>
           ${renderList(recs.take)}
           <div class="rec-links">${renderLinks(recs.links.gear)}</div>
         </section>
 
         <section class="rec-block">
-          <h3>2) Что надеть: тренд + комфорт</h3>
+          <h3>Что надеть: тренд + комфорт</h3>
           ${renderList(recs.wear)}
           <div class="rec-links">${renderLinks(recs.links.fashion)}</div>
         </section>
 
         <section class="rec-block">
-          <h3>3) Какой транспорт выбрать</h3>
+          <h3>Какой транспорт выбрать</h3>
           ${renderList(recs.transport)}
           <div class="rec-links">${renderLinks(recs.links.transport)}</div>
         </section>
 
         <section class="rec-block">
-          <h3>4) На что обратить внимание метеозависимым</h3>
+          <h3>На что обратить внимание метеозависимым</h3>
           ${renderList(recs.meteo)}
           <div class="rec-links">${renderLinks(recs.links.health)}</div>
         </section>
